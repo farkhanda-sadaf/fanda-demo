@@ -1,0 +1,27 @@
+name: AWS OIDC Deploy 
+on:
+  push
+env:
+  AWS_REGION : "us-east-1"   
+permissions:
+      id-token: write   
+      contents: read    
+jobs:
+  OIDCfanda:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v1
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::823332935035:role/Github-Action-role
+          role-session-name: samplerolesession
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Print AWS SSM Parameter
+        run: aws ssm get-parameter --name=Github-oidc-pm --query Parameter.Value
+
+      - name: Print assumed role
+        run: aws sts get-caller-identity
